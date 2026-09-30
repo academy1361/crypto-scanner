@@ -481,7 +481,7 @@ async function scan(){
     cache.clear();
     const btc = await btcRegime();
     
-    // فیلتر نمادهای معتبر
+    // ✅ فیلتر خودکار نمادهای معتبر
     let validSymbols = C.symbols;
     try {
       const info = await getJSON(`${C.futuresBase}/exchangeInfo`);
@@ -490,10 +490,15 @@ async function scan(){
           .filter(s => s.status === "TRADING" && s.quoteAsset === "USDT" && s.contractType === "PERPETUAL")
           .map(s => s.symbol)
       );
+      const before = C.symbols.length;
       validSymbols = C.symbols.filter(s => validSet.has(s));
-      console.log(`✅ نمادهای معتبر: ${validSymbols.length}/${C.symbols.length}`);
+      const removed = C.symbols.filter(s => !validSet.has(s));
+      if(removed.length > 0) {
+        console.log(`⚠️ نمادهای حذف‌شده:`, removed);
+      }
+      console.log(`✅ نمادهای معتبر: ${validSymbols.length}/${before}`);
     } catch(e){ 
-      console.warn("خطا در دریافت لیست نمادها:", e); 
+      console.warn("خطا در فیلتر نمادها:", e); 
     }
     
     results = [];
@@ -502,7 +507,7 @@ async function scan(){
       catch(e){ console.warn(validSymbols[i], e); }
       $("status").textContent = `${i+1}/${validSymbols.length}`;
     }
-    ...
+    // ... بقیه کد
 
 /* ---------- Backtest ---------- */
 function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
