@@ -749,3 +749,23 @@ renderJournal();
 loadCloudJournal();
 initTerminal();
 runRadar();
+
+/* ---------- اسکن خودکار ---------- */
+let autoScanEnabled = true;
+let autoScanTimer = null;
+
+function startAutoScan(){
+  if(autoScanTimer) clearInterval(autoScanTimer);
+  autoScanTimer = setInterval(async () => {
+    if(autoScanEnabled && !document.hidden){
+      console.log("🤖 اسکن خودکار:", new Date().toLocaleTimeString("fa-IR"));
+      await scan();
+      await runRadar();
+      await updateJournal();
+    }
+  }, C.refreshMs); // هر ۵ دقیقه
+  console.log("✅ اسکن خودکار فعال شد — هر ۵ دقیقه");
+}
+
+// شروع خودکار
+startAutoScan();
