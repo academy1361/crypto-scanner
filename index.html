@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Crypto Early Scanner v13</title>
+<meta name="description" content="اسکنر زودهنگام ارز دیجیتال با تحلیل چندلایه، بک‌تست، ژورنال و ترمینال تحلیل معاملاتی">
+<link rel="stylesheet" href="style.css">
+<script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+</head>
+<body>
+<header class="top">
+  <div>
+    <h1>Crypto Early Scanner <span>v13</span></h1>
+    <p>Signal Engine: WATCH → SETUP → TRIGGER → CONFIRMED</p>
+  </div>
+  <div class="actions">
+    <button id="scanBtn">اسکن بازار</button>
+    <button id="btBtn" class="secondary">بک‌تست ۳۰ ارز</button>
+  </div>
+</header>
+
+<section class="cards">
+  <div class="card"><small>BTC Regime</small><strong id="btcRegime">—</strong><span id="btcPrice">—</span></div>
+  <div class="card"><small>Signals</small><strong id="signalCount">0</strong><span>TRIGGER/CONFIRMED</span></div>
+  <div class="card"><small>Last Scan</small><strong id="lastScan">—</strong><span id="status">آماده</span></div>
+  <div class="card"><small>Universe</small><strong>30</strong><span>USDT Perpetual</span></div>
+</section>
+
+<main>
+<section class="panel">
+  <div class="panel-head">
+    <h2>سیگنال‌های زودهنگام</h2>
+    <label>حداقل امتیاز <input id="minScore" type="number" value="65" min="0" max="100"></label>
+  </div>
+  <div class="table-wrap">
+  <table>
+    <thead><tr>
+      <th>Symbol</th><th>Phase</th><th>Score</th><th>Entry Zone</th><th>Invalidation</th>
+      <th>TP1</th><th>TP2</th><th>TP3</th><th>R:R</th><th>Conf.</th><th>Fake</th>
+    </tr></thead>
+    <tbody id="signals"></tbody>
+  </table>
+  </div>
+</section>
+
+<section class="grid2">
+<section class="panel">
+  <div class="panel-head"><h2>جزئیات</h2><span id="selectedTitle">یک نماد را انتخاب کنید</span></div>
+  <div id="detail" class="detail empty">از جدول بالا یک نماد را انتخاب کنید.</div>
+</section>
+<section class="panel">
+  <div class="panel-head"><h2>Signal Pipeline</h2></div>
+  <div id="pipeline" class="pipeline">
+    <div>WATCH</div><div>SETUP</div><div>TRIGGER</div><div>CONFIRMED</div>
+  </div>
+  <div id="reasons" class="reasons">هنوز اسکن انجام نشده است.</div>
+</section>
+</section>
+
+<section class="panel" id="terminalV13">
+  <div class="panel-head">
+    <h2>Terminal تحلیل معاملاتی</h2>
+    <div class="terminal-controls">
+      <select id="terminalSymbol"></select>
+      <select id="terminalTf">
+        <option value="15m">15m</option>
+        <option value="1h">1h</option>
+        <option value="4h">4h</option>
+      </select>
+      <button id="terminalLoad">بارگذاری</button>
+    </div>
+  </div>
+  <div id="mtfMap" class="mtf-map"></div>
+  <div class="chart-wrap">
+    <div id="tvChart" style="width:100%;height:430px;"></div>
+  </div>
+  <div id="terminalSummary" class="stats"></div>
+  <div id="terminalLevels" class="stats"></div>
+</section>
+
+<section class="panel">
+  <div class="panel-head">
+    <h2>Liquidation / Positioning Radar</h2>
+    <button id="radarBtn" class="secondary">به‌روزرسانی Radar</button>
+  </div>
+  <div id="radarSummary" class="stats"></div>
+  <div class="table-wrap"><table><thead><tr>
+    <th>Symbol</th><th>Long%</th><th>Short%</th><th>L/S</th><th>OI Δ</th><th>Funding</th><th>Positioning</th>
+  </tr></thead><tbody id="radarTable"></tbody></table></div>
+</section>
+
+<section class="panel">
+  <div class="panel-head">
+    <h2>تاریخچه سیگنال‌ها</h2>
+    <div class="bt-controls"><button id="clearHistory" class="secondary">پاک‌کردن تاریخچه</button><span class="muted">ذخیره در مرورگر</span></div>
+  </div>
+  <div class="stats" id="historyStats"></div>
+  <div class="table-wrap"><table><thead><tr>
+    <th>Time</th><th>Symbol</th><th>Phase</th><th>Score</th><th>Entry</th><th>TP1</th><th>TP2</th><th>TP3</th><th>30m</th><th>2h</th><th>6h</th>
+  </tr></thead><tbody id="historyTable"></tbody></table></div>
+</section>
+
+<section class="panel">
+  <div class="panel-head">
+    <h2>Performance Dashboard v10</h2>
+    <span class="muted" id="cloudStatus">Local Journal</span>
+  </div>
+  <div id="perfStats" class="stats"></div>
+  <div class="grid2">
+    <div><h3>Phase Performance</h3><div id="phasePerf" class="stats"></div></div>
+    <div><h3>Symbol Performance</h3><div id="symbolPerf" class="table-wrap"></div></div>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="panel-head">
+    <h2>Signal Journal v10</h2>
+    <div class="bt-controls">
+      <button id="journalRefresh" class="secondary">به‌روزرسانی نتایج</button>
+      <button id="syncJournal" class="secondary">Sync Cloud</button>
+      <button id="journalExport" class="secondary">Export CSV</button>
+    </div>
+  </div>
+  <div id="journalStats" class="stats"></div>
+  <div class="table-wrap"><table><thead><tr>
+    <th>Time</th><th>Symbol</th><th>Phase</th><th>Score</th><th>Entry</th><th>SL</th>
+    <th>TP1</th><th>TP2</th><th>TP3</th><th>Result</th><th>R</th><th>Age</th>
+  </tr></thead><tbody id="journalTable"></tbody></table></div>
+</section>
+
+<section class="panel">
+  <div class="panel-head">
+    <h2>بک‌تست استراتژی</h2>
+    <div class="bt-controls">
+      <select id="btTf"><option value="15m">15m</option><option value="1h">1h</option><option value="4h">4h</option></select>
+      <select id="btDays"><option value="30">30 روز</option><option value="60">60 روز</option><option value="90">90 روز</option></select>
+      <label>Fee % <input id="fee" type="number" step="0.001" value="0.04"></label>
+      <label>Slip % <input id="slip" type="number" step="0.001" value="0.02"></label>
+      <button id="runBt">اجرای بک‌تست</button>
+    </div>
+  </div>
+  <div id="btProgress" class="progress"><span></span></div>
+  <div id="btSummary" class="stats"></div>
+  <div class="table-wrap"><table><thead><tr>
+    <th>Symbol</th><th>Trades</th><th>Win%</th><th>Avg R</th><th>Net R</th><th>PF</th><th>Max DD</th><th>TP1</th><th>TP2</th><th>TP3</th>
+  </tr></thead><tbody id="btTable"></tbody></table></div>
+</section>
+
+<section class="panel note">
+  <h2>نکات مهم</h2>
+  <ul>
+    <li>سطوح Entry / Invalidation / TP برای پژوهش و تست سیستم هستند، نه تضمین سود یا توصیه مالی.</li>
+    <li>بک‌تست با ورود در کندل بعد از سیگنال انجام می‌شود تا look-ahead bias کاهش یابد.</li>
+    <li>در برخورد همزمان فرضی SL و TP در یک کندل، SL محافظه‌کارانه در نظر گرفته می‌شود.</li>
+    <li>OI تاریخی در بک‌تست نسخه رایگان به‌صورت مصنوعی از قیمت/حجم بازسازی نمی‌شود؛ در نتیجه فیلتر OI برای جلوگیری از ادعای کاذب، وزن محدودتری دارد.</li>
+  </ul>
+</section>
+</main>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
