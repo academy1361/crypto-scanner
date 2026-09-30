@@ -475,28 +475,34 @@ window.selectSymbol = function(sym){
   ساختار: buy pressure ${x.bp.toFixed(1)}%، OI Δ ${x.oid.toFixed(2)}%، RSI ${x.r.toFixed(1)}`;
 };
 
-/* ---------- Scan ---------- */
 async function scan(){
   $("status").textContent = "در حال اسکن...";
   try{
     cache.clear();
     const btc = await btcRegime();
-    results = [];
-    for(let i = 0; i < C.symbols.length; i++){
-      try{ results.push(await analyze(C.symbols[i], btc)); }
-      catch(e){ console.warn(C.symbols[i], e); }
-      $("status").textContent = `${i+1}/${C.symbols.length}`;
+    
+    // فیلتر نمادهای معتبر
+    let validSymbols = C.symbols;
+    try {
+      const info = await getJSON(`${C.futuresBase}/exchangeInfo`);
+      const validSet = new Set(
+        info.symbols
+          .filter(s => s.status === "TRADING" && s.quoteAsset === "USDT" && s.contractType === "PERPETUAL")
+          .map(s => s.symbol)
+      );
+      validSymbols = C.symbols.filter(s => validSet.has(s));
+      console.log(`✅ نمادهای معتبر: ${validSymbols.length}/${C.symbols.length}`);
+    } catch(e){ 
+      console.warn("خطا در دریافت لیست نمادها:", e); 
     }
-    $("lastScan").textContent = new Date().toLocaleTimeString("fa-IR");
-    results.filter(x => x.phase === "TRIGGER" || x.phase === "CONFIRMED").forEach(saveSignal);
-    render();
-    renderJournal();
-    if(results.length) selectSymbol(results.sort((a, b) => b.score - a.score)[0].symbol);
-    $("status").textContent = "تکمیل شد";
-  }catch(e){
-    $("status").textContent = "خطا: " + e.message;
-  }
-}
+    
+    results = [];
+    for(let i = 0; i < validSymbols.length; i++){
+      try{ results.push(await analyze(validSymbols[i], btc)); }
+      catch(e){ console.warn(validSymbols[i], e); }
+      $("status").textContent = `${i+1}/${validSymbols.length}`;
+    }
+    ...
 
 /* ---------- Backtest ---------- */
 function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
