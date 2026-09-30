@@ -1,5 +1,5 @@
 /* ============================================================
-   Crypto Early Scanner v13
+   Crypto Early Scanner v13 — نسخه اصلاح‌شده
    ============================================================ */
 const C = window.SCANNER_CONFIG;
 const $ = id => document.getElementById(id);
@@ -109,21 +109,31 @@ function entryLevels(k, phase){
   const r = Math.max(0.15*a, center - invalid);
   return { low, high, invalid, tp1: center + r, tp2: center + 2*r, tp3: center + 3*r, r, center };
 }
+
+/* ---------- اصلاح‌شده: longShort ---------- */
 async function longShort(symbol){
   try{
-    const pair = symbol.replace("USDT", "");
-    const d = await getJSON(`${C.futuresBase}/globalLongShortAccountRatio?pair=${pair}&period=15m&limit=1`);
+    const base = C.futuresBase.replace("/fapi/v1", "");
+    const d = await getJSON(`${base}/futures/data/globalLongShortAccountRatio?symbol=${symbol}&period=15m&limit=1`);
     const x = d?.[0] || {};
     return { ratio: +x.longShortRatio || 1, long: +x.longAccount*100 || 50, short: +x.shortAccount*100 || 50 };
-  }catch{ return { ratio: 1, long: 50, short: 50 }; }
+  }catch(e){ 
+    console.warn("longShort error:", e.message);
+    return { ratio: 1, long: 50, short: 50 }; 
+  }
 }
+
+/* ---------- اصلاح‌شده: topPosition ---------- */
 async function topPosition(symbol){
   try{
-    const pair = symbol.replace("USDT", "");
-    const d = await getJSON(`${C.futuresBase}/topLongShortPositionRatio?pair=${pair}&period=15m&limit=1`);
+    const base = C.futuresBase.replace("/fapi/v1", "");
+    const d = await getJSON(`${base}/futures/data/topLongShortPositionRatio?symbol=${symbol}&period=15m&limit=1`);
     const x = d?.[0] || {};
     return { ratio: +x.longShortRatio || 1, long: +x.longPosition*100 || 50, short: +x.shortPosition*100 || 50 };
-  }catch{ return { ratio: 1, long: 50, short: 50 }; }
+  }catch(e){ 
+    console.warn("topPosition error:", e.message);
+    return { ratio: 1, long: 50, short: 50 }; 
+  }
 }
 
 /* ---------- Structure (SMC heuristics) ---------- */
@@ -763,9 +773,9 @@ function startAutoScan(){
       await runRadar();
       await updateJournal();
     }
-  }, C.refreshMs); // هر ۵ دقیقه
+  }, C.refreshMs);
   console.log("✅ اسکن خودکار فعال شد — هر ۵ دقیقه");
 }
 
-// شروع خودکار
+// ✅ شروع خودکار — این خط را اضافه کن
 startAutoScan();
