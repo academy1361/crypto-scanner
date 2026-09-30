@@ -481,7 +481,7 @@ async function scan(){
     cache.clear();
     const btc = await btcRegime();
     
-    // ✅ فیلتر خودکار نمادهای معتبر
+    // فیلتر خودکار نمادهای معتبر
     let validSymbols = C.symbols;
     try {
       const info = await getJSON(`${C.futuresBase}/exchangeInfo`);
@@ -507,7 +507,17 @@ async function scan(){
       catch(e){ console.warn(validSymbols[i], e); }
       $("status").textContent = `${i+1}/${validSymbols.length}`;
     }
-    // ... بقیه کد
+    $("lastScan").textContent = new Date().toLocaleTimeString("fa-IR");
+    results.filter(x => x.phase === "TRIGGER" || x.phase === "CONFIRMED").forEach(saveSignal);
+    render();
+    renderJournal();
+    if(results.length) selectSymbol(results.sort((a, b) => b.score - a.score)[0].symbol);
+    $("status").textContent = "تکمیل شد";
+  }catch(e){
+    $("status").textContent = "خطا: " + e.message;
+  }
+}
+  
 
 /* ---------- Backtest ---------- */
 function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
