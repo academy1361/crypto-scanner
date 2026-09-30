@@ -1,5 +1,5 @@
 /* ============================================================
-   Crypto Early Scanner v13 — نسخه اصلاح‌شده
+   Crypto Early Scanner v13 — نسخه نهایی و اصلاح‌شده
    ============================================================ */
 const C = window.SCANNER_CONFIG;
 const $ = id => document.getElementById(id);
@@ -475,6 +475,7 @@ window.selectSymbol = function(sym){
   ساختار: buy pressure ${x.bp.toFixed(1)}%، OI Δ ${x.oid.toFixed(2)}%، RSI ${x.r.toFixed(1)}`;
 };
 
+/* ---------- Scan (با فیلتر خودکار نمادها) ---------- */
 async function scan(){
   $("status").textContent = "در حال اسکن...";
   try{
@@ -517,7 +518,6 @@ async function scan(){
     $("status").textContent = "خطا: " + e.message;
   }
 }
-  
 
 /* ---------- Backtest ---------- */
 function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
@@ -798,5 +798,5 @@ function startAutoScan(){
   console.log("✅ اسکن خودکار فعال شد — هر ۵ دقیقه");
 }
 
-// ✅ شروع خودکار — این خط را اضافه کن
+// ✅ شروع اسکن خودکار — این خط حیاتی است
 startAutoScan();
